@@ -1,0 +1,71 @@
+#! /bin/bash
+# $T
+# $TARGET_PRODUCT
+# $TARGET_BUILD_VARIANT
+
+if [ -z $T ] || [ -z $TARGET_PRODUCT ] || [ -z $TARGET_BUILD_VARIANT ]; then
+    echo "env is not rigth."
+    exit
+fi
+
+if [ ! -f $T/.system.change ] ; then
+    echo "nothing to be push."
+    exit
+fi
+
+LOG_FILE=$T/.system.change
+OUT_DIR=$T/out/target/product/$TARGET_PRODUCT
+SYSTEM_DIR=$OUT_DIR/system
+
+alert_user_to_confirm()
+{
+    read -p "The above files will be installed. [Y/n] " -n 1 choice
+
+    if [ x"$choice" = "xn" ] ; then
+        echo ""
+        echo " exit..."
+        exit
+    fi
+    echo ""
+}
+
+
+show_install_files()
+{
+    for file in $(cat $LOG_FILE)
+    do
+        [ -f $OUT_DIR/$file ] && echo "$file"
+    done
+    echo ""
+}
+
+push_files()
+{
+    local FILE_PATH=$1
+    [ -f $OUT_DIR/$FILE_PATH ] && adb remount && adb push $OUT_DIR/$FILE_PATH /"$FILE_PATH"
+}
+
+install_files()
+{
+    local FILE_PATH=$1
+    [ -f $OUT_DIR/$FILE_PATH ] && echo "begin install $FILE_PATH" && adb install -r $OUT_DIR/$FILE_PATH
+}
+
+show_install_files
+
+if [ x"$1" != "xq" ] ; then
+    alert_user_to_confirm
+fi
+
+for file in $(cat $LOG_FILE)
+do
+    if [ x$(basename $0) = x"auto_install" ] && [[ $(basename $file) == *.apk ]]; then
+        install_files $file
+    else
+        push_files $file
+    fi
+done
+
+rm $LOG_FILE
+
+

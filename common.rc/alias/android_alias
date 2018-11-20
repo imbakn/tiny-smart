@@ -1,0 +1,48 @@
+##################### ADB #############################
+alias rmt="adb wait-for-device && adb remount"
+alias rbt="adb reboot || fastboot reboot"
+alias rbtb="adb reboot bootloader"
+alias rbtr="adb reboot recovery"
+alias shl="adb wait-for-device && super_adb.py"
+alias loga="adb logcat -v threadtime -v color -b all"
+alias log="adb logcat -v threadtime -v color"
+alias loge="adb logcat -v threadtime -v color \"*:E\""
+alias logf="adb logcat -v threadtime -v color \"*:F\""
+
+alias push="adb wait-for-device && adb remount &&  adb push"
+alias pull="adb pull"
+alias inst="adb wait-for-device && adb install -r"
+alias insts="adb wait-for-device && install_multi_apks"
+alias uninst="uninstall_apk.bash"
+alias atop="watch adb shell top -m 20 -s cpu -n 1"
+alias lg="log_search.bash"
+
+##################### AUTO PUSH #######################
+alias aw="nohup android_inotify.py  >/dev/null 2>&1 &"
+alias adw="nohup android_inotify.py data >/dev/null 2>&1 &"
+alias ae='[ -f "$T/.system.change" ] && vim "$T/.system.change"'
+alias ac='[ -f "$T/.system.change" ] && cat "$T/.system.change"'
+alias ap="adb wait-for-device && auto_push"
+alias ai="adb wait-for-device && auto_install"
+
+###################### REPO ##########################
+alias rp='repoupload'
+alias rs='repo sync -j4 2>/tmp/repo_sync.log ; echo "=============NOTE THIS==============" ;cat /tmp/repo_sync.log'
+alias gpush="git status | fpp -c git_auto_push.bash"
+alias rpush="git status | fpp -c repo_auto_upload.bash"
+
+alias rpb="export UPLOAD_TYPE=bug && git status | fpp -c repo_auto_upload.bash"
+alias rpf="export UPLOAD_TYPE=feature && git status | fpp -c repo_auto_upload.bash"
+
+###################### CHANGE DIR ####################
+alias t='[ -z "$T" ] || eval "cd $T"'
+alias o='[ -z "$T" ] || eval "cd $T/out/target/product/$TARGET_PRODUCT"'
+alias k='[ -z "$T" ] || eval "cd $T/kernel/msm-3.18"'
+alias j='android_auto_jump'
+alias a='goto_mk_dir'
+alias mx='tmuxinator'
+
+######################## TOOL ######################
+alias ta="adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'"
+alias tof='adb shell dumpsys activity | grep "mFoc"'
+alias bgra="adb wait-for-device && adb shell dmesg | perl $T/kernel/msm-3.18/scripts/bootgraph.pl"

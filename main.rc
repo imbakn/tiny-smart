@@ -1,0 +1,60 @@
+#! /usr/bin/env bash
+
+export SMARTDIR=~/.smart
+
+SMART_BASHRC=$SMARTDIR/common.rc
+SMART_EXEC=$SMARTDIR/exec
+
+
+filename=$(basename "$fullfile")
+extension="${filename##*.}"
+
+filesuf()
+{
+    local WHOLE_NAME=$1
+    local FILE_NAME=$(basename "$WHOLE_NAME")
+    echo ${FILE_NAME##*.}
+}
+
+sourceone()
+{
+    local FILE_TO_SOURCE=$1
+    CURRENT_SHELL=$SMART_SHELL
+    FILETYPE=$(filesuf $FILE_TO_SOURCE)
+    BASENAME=$(basename "$FILE_TO_SOURCE")
+    if [ x"$FILETYPE" = x"$CURRENT_SHELL" ] || [ x"$BASENAME" = x"$FILETYPE" ]
+    then
+        source $FILE_TO_SOURCE
+    fi
+}
+
+sourcedir()
+{
+    local SOURCEDIR=$1
+    for list in $(ls $SOURCEDIR)
+    do
+       [ -f $SOURCEDIR/$list ] && sourceone $SOURCEDIR/$list
+       [ -d $SOURCEDIR/$list ] && sourcedir $SOURCEDIR/$list
+    done
+}
+
+addpath()
+{
+    local PATHTOADD=$1
+    export PATH=$PATHTOADD:$PATH
+}
+
+addpathdir()
+{
+    local ADDPATHDIR=$1
+    for list in $(ls $ADDPATHDIR)
+    do
+       addpath $ADDPATHDIR/$list
+    done
+}
+
+sourcedir $SMART_BASHRC
+[ -d $SMARTDIR/personal/user.rc ] && sourcedir $SMARTDIR/personal/user.rc
+addpathdir $SMART_EXEC
+addpath ~/.android.projects
+
